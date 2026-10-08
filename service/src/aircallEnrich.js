@@ -133,7 +133,9 @@ export function describeCall(call, contactName, transcript) {
   const callId = p.hs_call_external_id || firstMatch(bodyText, /Call ID:\s*(\d+)/i);
   const when = formatWhen(p.hs_timestamp);
   const duration = formatDuration(p.hs_call_duration);
-  const transcriptText = (transcript ?? []).map((u) => `[${formatClock(u.startTimeSeconds)}] ${u.text}`).join("\n");
+  const speakers = new Set((transcript ?? []).map((u) => u.speaker).filter(Boolean));
+  const speakerLabel = (u) => (speakers.size > 1 ? `${u.speaker === "internal" ? "Agent" : "Caller"}: ` : "");
+  const transcriptText = (transcript ?? []).map((u) => `[${formatClock(u.startTimeSeconds)}] ${speakerLabel(u)}${u.text}`).join("\n");
 
   const subjectByType = {
     [CALL_TYPES.voicemail]: `Voicemail from ${caller}`,
@@ -169,7 +171,7 @@ export function describeCall(call, contactName, transcript) {
   if (transcriptText) {
     noteParts.push(
       `<p><strong>Transcript</strong></p><p>${(transcript ?? [])
-        .map((u) => `<em>${formatClock(u.startTimeSeconds)}</em> ${escapeHtml(u.text)}`)
+        .map((u) => `<em>${formatClock(u.startTimeSeconds)}</em> ${escapeHtml(speakerLabel(u))}${escapeHtml(u.text)}`)
         .join("<br>")}</p>`
     );
   }
