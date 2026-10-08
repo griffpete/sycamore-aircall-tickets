@@ -53,3 +53,7 @@ From `hubspot/`: `hs project upload --account=243811447`, then approve the app's
 HubSpot's public Transcripts API only returns transcripts to the app that uploaded them, and Aircall's app uploaded these, so `GET /crm/extensions/calling/2026-03/transcripts/{callId}` answers 401 "not owned by your app" for Aircall calls. The service therefore asks Aircall first (`GET https://api.aircall.io/v1/calls/{aircallCallId}/transcription`, Basic auth `AIRCALL_API_ID:AIRCALL_API_TOKEN`, needs Aircall AI Assist) and falls back to HubSpot, which only works for HubSpot-native calls. Without Aircall credentials the ticket still gets the voicemail link and HubSpot's AI summary, just no verbatim transcript. `npm run aircall:dump -- <aircall call id>` prints the raw Aircall response to confirm the field names; `parseAircallTranscript` in `src/aircallApi.js` accepts the common shapes but adjust it if the dump looks different.
 
 Contacts: the app has no contacts scope, so caller names fall back to the phone number. Add `crm.objects.contacts.read` to the app and re-approve if names are wanted.
+
+## Decision 2026-10-07: no verbatim transcript on tickets
+
+Griffin chose to keep the full transcript and audio in Aircall and show a condensed version on the ticket: caller, line, time, duration, the Aircall voicemail link, and HubSpot's AI summary. So `AIRCALL_API_ID` / `AIRCALL_API_TOKEN` are intentionally not set on Render. The Aircall API code stays in place, disabled, in case that changes; setting the two variables turns transcripts on with no code change.
