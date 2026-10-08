@@ -1,0 +1,27 @@
+{
+  "uid": "aircall_ticket_enricher",
+  "type": "app",
+  "config": {
+    "name": "Aircall Ticket Enricher",
+    "description": "Copies Aircall call details, voicemail links and transcripts onto the support tickets Aircall creates.",
+    "distribution": "private",
+    "auth": {
+      "type": "static",
+      "requiredScopes": [
+        "oauth",
+        "crm.objects.tickets.read",
+        "crm.objects.tickets.write",
+        "crm.schemas.tickets.read",
+        "crm.schemas.tickets.write",
+        "crm.extensions_calling_transcripts.read"
+      ],
+      "optionalScopes": [],
+      "conditionallyRequiredScopes": []
+    },
+    "permittedUrls": {
+      "fetch": [],
+      "iframe": [],
+      "img": []
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "uid": "webhooks",
+  "type": "webhooks",
+  "config": {
+    "settings": {
+      "targetUrl": "https://sycamore-aircall-tickets.onrender.com/webhooks/hubspot",
+      "maxConcurrentRequests": 10
+    },
+    "subscriptions": {
+      "crmObjects": [
+        {
+          "subscriptionType": "object.creation",
+          "objectType": "ticket",
+          "active": true
+        },
+        {
+          "subscriptionType": "object.associationChange",
+          "objectType": "ticket",
+          "active": true
+        }
+      ],
+      "legacyCrmObjects": [],
+      "hubEvents": []
+    }
+  }
+}
