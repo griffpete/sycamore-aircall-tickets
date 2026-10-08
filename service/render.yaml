@@ -19,3 +19,7 @@ services:
         sync: false
       - key: HUBSPOT_PORTAL_ID
         value: "243811447"
+      - key: AIRCALL_API_ID
+        sync: false
+      - key: AIRCALL_API_TOKEN
+        sync: false

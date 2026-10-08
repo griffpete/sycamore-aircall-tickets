@@ -47,3 +47,9 @@ From `hubspot/`: `hs project upload --account=243811447`, then approve the app's
 - Aircall's call body starts with "Voicemail on <line>" (link `https://assets.aircall.io/calls/<id>/voicemail`) or "Missed call on <line>"; `hs_voicemail_count` is 1 for voicemails; `hs_call_duration` is 0 for missed calls.
 - HubSpot shows a blank first row in every dropdown and a "Dependent properties" card for conditional options; both are platform behaviour.
 - This folder lives on the iCloud-synced Desktop; `npm run dev` watches `src` only for that reason.
+
+## Transcript source
+
+HubSpot's public Transcripts API only returns transcripts to the app that uploaded them, and Aircall's app uploaded these, so `GET /crm/extensions/calling/2026-03/transcripts/{callId}` answers 401 "not owned by your app" for Aircall calls. The service therefore asks Aircall first (`GET https://api.aircall.io/v1/calls/{aircallCallId}/transcription`, Basic auth `AIRCALL_API_ID:AIRCALL_API_TOKEN`, needs Aircall AI Assist) and falls back to HubSpot, which only works for HubSpot-native calls. Without Aircall credentials the ticket still gets the voicemail link and HubSpot's AI summary, just no verbatim transcript. `npm run aircall:dump -- <aircall call id>` prints the raw Aircall response to confirm the field names; `parseAircallTranscript` in `src/aircallApi.js` accepts the common shapes but adjust it if the dump looks different.
+
+Contacts: the app has no contacts scope, so caller names fall back to the phone number. Add `crm.objects.contacts.read` to the app and re-approve if names are wanted.

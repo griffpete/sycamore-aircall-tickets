@@ -10,7 +10,8 @@
     "start": "node src/server.js",
     "dev": "node --watch-path=src src/server.js",
     "setup:hubspot": "node scripts/setup-hubspot.js",
-    "backfill": "node scripts/backfill.js"
+    "backfill": "node scripts/backfill.js",
+    "aircall:dump": "node scripts/aircall-dump.js"
   },
   "dependencies": {
     "@hubspot/api-client": "^14.0.1",

@@ -17,5 +17,7 @@ export const config = {
   publicBaseUrl: process.env.PUBLIC_BASE_URL.replace(/\/$/, ""),
   hubspotClientSecret: process.env.HUBSPOT_CLIENT_SECRET,
   hubspotAccessToken: process.env.HUBSPOT_ACCESS_TOKEN,
-  hubspotPortalId: process.env.HUBSPOT_PORTAL_ID
+  hubspotPortalId: process.env.HUBSPOT_PORTAL_ID,
+  aircallApiId: process.env.AIRCALL_API_ID ?? "",
+  aircallApiToken: process.env.AIRCALL_API_TOKEN ?? ""
 };

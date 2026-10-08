@@ -1,5 +1,6 @@
 import { getTicketProperties, hubspotGetOrNull, hubspotRequest, updateTicketProperties } from "./hubspot.js";
 import { AIRCALL_APP_ID, AIRCALL_PROPERTY_NAMES, CALL_TYPES } from "./aircallSchema.js";
+import { getAircallTranscript } from "./aircallApi.js";
 
 const CALL_PROPERTIES = [
   "hs_timestamp",
@@ -236,7 +237,7 @@ async function getContactName(ticketId) {
   return name;
 }
 
-async function getTranscript(call) {
+async function getHubSpotTranscript(call) {
   if (call.properties.hs_call_has_transcript !== "true") {
     return [];
   }
@@ -249,12 +250,17 @@ async function getTranscript(call) {
       .map((u) => ({ startTimeSeconds: u.startTimeSeconds ?? u.startTime ?? 0, text: (u.utterance ?? u.text ?? "").trim() }))
       .filter((u) => u.text);
   } catch (error) {
-    if (error.status !== 403 && error.status !== 404) {
-      console.error(`Transcript fetch for call ${call.id} failed: ${error.message}`);
+    if (![401, 403, 404].includes(error.status)) {
+      console.error(`HubSpot transcript for call ${call.id} failed: ${error.message}`);
     }
 
     return [];
   }
+}
+
+async function getTranscript(call, aircallCallId) {
+  const fromAircall = await getAircallTranscript(aircallCallId);
+  return fromAircall.length > 0 ? fromAircall : getHubSpotTranscript(call);
 }
 
 async function upsertNote(ticketId, existingNoteId, body, timestamp) {
@@ -301,7 +307,8 @@ export async function enrichAircallTicket(ticketId) {
     return { ticketId, skipped: "no Aircall call attached yet" };
   }
 
-  const [contactName, transcript] = await Promise.all([getContactName(ticketId), getTranscript(call)]);
+  const aircallCallId = call.properties.hs_call_external_id || firstMatch(stripHtml(call.properties.hs_call_body), /Call ID:\s*(\d+)/i);
+  const [contactName, transcript] = await Promise.all([getContactName(ticketId), getTranscript(call, aircallCallId)]);
   const details = describeCall(call, contactName, transcript);
   const properties = { ...details.properties };
 
